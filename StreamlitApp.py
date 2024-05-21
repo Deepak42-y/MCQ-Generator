@@ -1,13 +1,12 @@
 import os 
 import json
+import streamlit as st
 import pandas as pd
 import traceback
-from src.mcqgenerator.utils import read_file, get_table_data, get_table_download_link
-from src.mcqgenerator.logger import logging
 from src.mcqgenerator.MCQGenerator import generate_evaluate_chain
-import streamlit as st
+from src.mcqgenerator.logger import logging
+from src.mcqgenerator.utils import read_file, get_table_data, get_table_download_link
 from langchain.callbacks import get_openai_callback
-# import PyPDF2
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
