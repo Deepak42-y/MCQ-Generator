@@ -2,6 +2,7 @@ openai
 langchain
 streamlit
 python-dotenv
+dotenv
 streamlit
 PyPDF2
 pandas
