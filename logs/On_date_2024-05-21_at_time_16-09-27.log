@@ -1,0 +1,12 @@
+[2024-05-21 16:10:08,894] 71 root - ERROR - Traceback (most recent call last):
+  File "C:\Users\DEEPAK YADAV\Downloads\mcqgen\StreamlitApp.py", line 51, in <module>
+    reader = PyPDF2.PdfFileReader(uploaded_file)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DEEPAK YADAV\AppData\Roaming\Python\Python311\site-packages\PyPDF2\_reader.py", line 1974, in __init__
+    deprecation_with_replacement("PdfFileReader", "PdfReader", "3.0.0")
+  File "C:\Users\DEEPAK YADAV\AppData\Roaming\Python\Python311\site-packages\PyPDF2\_utils.py", line 369, in deprecation_with_replacement
+    deprecation(DEPR_MSG_HAPPENED.format(old_name, removed_in, new_name))
+  File "C:\Users\DEEPAK YADAV\AppData\Roaming\Python\Python311\site-packages\PyPDF2\_utils.py", line 351, in deprecation
+    raise DeprecationError(msg)
+PyPDF2.errors.DeprecationError: PdfFileReader is deprecated and was removed in PyPDF2 3.0.0. Use PdfReader instead.
+
