@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from src.mcqgenerator.logger import logging
 
 #importing necessary packages from langchain
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import OpenAI
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chains import SequentialChain

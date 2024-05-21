@@ -1,81 +1,95 @@
 import os
-import os 
 import json
-import traceback
 import pandas as pd
-from dotenv import load_dotenv
-from src.mcqgenerator.utils import read_file,get_table_data
-import streamlit as st
-from langchain_community.callbacks import get_openai_callback
+import traceback
+from src.mcqgenerator.utils import read_file, get_table_data
+from src.mcqgenerator.logger import logging
 from src.mcqgenerator.MCQGenerator import generate_evaluate_chain
-from src.mcqgenerator.logger import logging 
+import streamlit as st
+from langchain.callbacks import get_openai_callback
+import PyPDF2
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 
-# Loading json file 
-with open(r'C:\Users\DEEPAK YADAV\Downloads\mcqgen\Response.json','r') as file:
-    RESPONSE_JSON = json.load(file)
+# Loading JSON file
+try:
+    with open("Response.json", 'r') as file:
+        RESPONSE_JSON = json.load(file)
+except FileNotFoundError:
+    st.error("Response.json file not found")
+    RESPONSE_JSON = {}
 
-# Creating a title for the app
-st.title('MCQ Generator Application with Langchain 🦜️🔗')
+# Create title for the app
+st.title("MCQ Generator from given Paragraphs using Langchain 🦜️🔗:")
 
 # Create a form using st.form
-with st.form('user_inputs'):
-    # File upload 
-    uploaded_file=st.file_uploader('Upload a PDF or txt file')
+with st.form("user_inputs"):
+    # File Upload
+    uploaded_file = st.file_uploader("Upload a PDF or Text File")
 
-    #Input fields 
-    mcq_count = st.number_input('No. of MCQs.', min_value=3, max_value=50)
+    # Input Fields
+    mcq_counts = st.number_input("No. of MCQs to generate:", min_value=3, max_value=50)
 
-    # Subject 
-    subject=st.text_input('Insert Subject',max_chars=40)
+    # Subject
+    subject = st.text_input("Insert Subject:", max_chars=20)
 
-    # Quiz Tone
-    tone=st.text_input('Complexity Level of Questions', max_chars=20, placeholder='Simple')
+    # Quiz tone
+    tone = st.text_input("Complexity Level of Question:", max_chars=20, placeholder="Simple")
 
-    # Add button
-    button=st.form_submit_button('Create MCQs')
+    # Add Button
+    button = st.form_submit_button("Create MCQs")
 
-    # Check if the button is clicked and all fields have input 
-    if button and uploaded_file is not None and mcq_count and subject and tone:
-        with st.spinner('loading...'):
+    # Check if Button is clicked and all fields have inputs
+    if button and uploaded_file is not None and mcq_counts and subject and tone:
+        with st.spinner("Generating..."):
             try:
-                text=read_file(uploaded_file)
+                # Read the uploaded file
+                if uploaded_file.type == "application/pdf":
+                    # Reading PDF
+                    reader = PyPDF2.PdfFileReader(uploaded_file)
+                    text = ""
+                    for page in range(reader.numPages):
+                        text += reader.getPage(page).extract_text()
+                else:
+                    # Assuming it is a text file
+                    text = uploaded_file.read().decode("utf-8")
 
-                # Count tokens and  the cost of API call
+                # Count tokens and cost of API
                 with get_openai_callback() as cb:
-                    response = generate_evaluate_chain(
-                        {
-                            'text':text,
-                            'number':mcq_count,
-                            'subject':subject,
-                            'tone':tone,
-                            'response_json': json.dumps(RESPONSE_JSON)
-                        }
-                    )
-            
+                    response = generate_evaluate_chain({
+                        "text": text,
+                        "number": mcq_counts,
+                        "subject": subject,
+                        "tone": tone,
+                        "response_json": json.dumps(RESPONSE_JSON)
+                    })
+                    # st.write(response)
+
             except Exception as e:
-                traceback.print_exception(type(e), e, e.__traceback__)
-                st.error('Error')
+                logging.error(traceback.format_exc())
+                st.error(f"An error occurred: {e}")
 
             else:
-                print(f"Total Tokens:{cb.total_tokens}")
-                print(f"Prompt Tokens:{cb.prompt_tokens}")
-                print(f"Completion Tokens:{cb.completion_tokens}")
-                print(f"Total Cost:{cb.total_cost}")
-                
+                st.write(f"Total Tokens: {cb.total_tokens}")
+                st.write(f"Prompt Tokens: {cb.prompt_tokens}")
+                st.write(f"Completion Tokens: {cb.completion_tokens}")
+                st.write(f"Total Cost: {cb.total_cost}")
+
                 if isinstance(response, dict):
-                    # Extract the quiz data from response 
-                    quiz = response.get('quiz',None)
+                    quiz = response.get("quiz", None)
                     if quiz is not None:
                         table_data = get_table_data(quiz)
                         if table_data is not None:
-                            df=pd.DataFrame(table_data)
-                            df.index = df.index+1
+                            df = pd.DataFrame(table_data)
+                            df.index = df.index + 1
                             st.table(df)
 
-                            # Display the review in a text box as well
-                            st.text_area(label='Review', value=response['review'])
+                            # Display review in text box as well
+                            st.text_area(label="Review", value=response.get("review", ""))
+
                         else:
-                            st.error('Error in the table data')
+                            st.error("Error in table data")
                 else:
                     st.write(response)
