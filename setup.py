@@ -13,6 +13,7 @@ setup(
         'langchain',
         "streamlit",
         "python-dotenv",
-        "PyPDF2"
+        "PyPDF2",
+        "langchain_community"
     ], 
 )
