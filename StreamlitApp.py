@@ -7,7 +7,7 @@ from src.mcqgenerator.logger import logging
 from src.mcqgenerator.MCQGenerator import generate_evaluate_chain
 import streamlit as st
 from langchain.callbacks import get_openai_callback
-import PyPDF2
+# import PyPDF2
 from dotenv import load_dotenv
 
 # Load environment variables from .env file

@@ -5,7 +5,9 @@ import json
 import streamlit as st
 from dotenv import load_dotenv
 import base64
+import ast
 
+#########################################################################################################
 def read_file(file):
     if file.name.endswith(".pdf"):
         try:
@@ -24,9 +26,7 @@ def read_file(file):
     else:
         raise Exception("Unsupported file format. Only PDF and text files are supported.")
     
-import ast
-
-
+#########################################################################################################
 
 
 def get_table_data(quiz):
@@ -64,6 +64,7 @@ def get_table_data(quiz):
         traceback.print_exception(type(e), e, e.__traceback__)
         return []
 
+#########################################################################################################
 
 def get_table_download_link(df):
     # CSV
